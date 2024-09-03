@@ -14,12 +14,12 @@ export default class AuthController {
   public async register({ request, auth }: HttpContextContract) {
     const email = request.input("email");
     const password = request.input("password");
-    // const name = request.input("name");
+    const name = request.input("name");
 
     const user = new User();
     user.email = email;
     user.password = password;
-    // user.name = name;
+    user.name = name;
     await user.save();
 
     const token = await auth.use("api").login(user, {

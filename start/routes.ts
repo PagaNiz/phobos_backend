@@ -9,9 +9,16 @@ Route.group(() => {
   Route.post("login", "AuthController.login");
 
   Route.group(() => {
+    Route.post("todos", "TodosController.store");
     Route.get("todos", "TodosController.index");
     Route.get("todos/:id", "TodosController.show");
-    Route.put("todos/update", "TodosController.update");
-    Route.post("todos", "TodosController.store");
+    Route.put("todos/update/:id", "TodosController.update");
+    Route.put("todos/delete/:id", "TodosController.destroy");
+
+    Route.post("client/register", "ClientsController.store");
+    Route.get("client", "ClientsController.index");
+    Route.get("client/:id", "ClientsController.show");
+    Route.put("client/update/:id", "ClientsController.update");
+    Route.delete("client/delete/:id", "ClientsController.destroy");
   }).middleware("auth:api");
 }).prefix("api");

@@ -39,6 +39,7 @@ export default class TodosController {
     todo.title = request.input("title");
     todo.desc = request.input("desc");
     await todo.save();
+    console.log(response.json({ message: "TODO Created successfully!" }));
     return todo;
   }
 
