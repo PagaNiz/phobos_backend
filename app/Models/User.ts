@@ -6,12 +6,18 @@ import {
   BaseModel,
   hasMany,
   HasMany,
+  beforeFind,
+  beforeFetch,
+  ModelQueryBuilderContract,
 } from "@ioc:Adonis/Lucid/Orm";
 import Todo from "./Todo";
 
 export default class User extends BaseModel {
-  @column({ isPrimary: true })
+  @column({ isPrimary: true, serializeAs: null })
   public id: number;
+
+  @column({ serializeAs: "id" })
+  public uuid: string;
 
   @column()
   public name: string;
@@ -31,8 +37,17 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime;
 
+  @column.dateTime({ serializeAs: null })
+  public deletedAt: DateTime;
+
   @hasMany(() => Todo)
   public todos: HasMany<typeof Todo>;
+
+  @beforeFind()
+  @beforeFetch()
+  public static ignoreDeleted(query: ModelQueryBuilderContract<typeof User>) {
+    query.andWhereNull("users.deleted_at");
+  }
 
   @beforeSave()
   public static async hashPassword(user: User) {

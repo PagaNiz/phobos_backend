@@ -1,15 +1,18 @@
 import BaseSchema from "@ioc:Adonis/Lucid/Schema";
 
-export default class Todos extends BaseSchema {
-  protected tableName = "todos";
+export default class extends BaseSchema {
+  protected tableName = "purchase_order_products";
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments("id");
       table.uuid("uuid").unique().notNullable();
-      table.string("title", 255).notNullable();
-      table.string("desc", 255).notNullable();
-      table.boolean("done").defaultTo(false);
+      table
+        .integer("purchase_order_id")
+        .unsigned()
+        .references("id")
+        .inTable("purchase_orders");
+      table.timestamp("stock_order", { useTz: true });
       table.timestamp("created_at", { useTz: true }).notNullable();
       table.timestamp("updated_at", { useTz: true }).notNullable();
       table.timestamp("deleted_at", { useTz: true }).nullable().defaultTo(null);

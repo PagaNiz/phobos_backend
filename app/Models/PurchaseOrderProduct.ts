@@ -7,21 +7,18 @@ import {
   ModelQueryBuilderContract,
 } from "@ioc:Adonis/Lucid/Orm";
 
-export default class Product extends BaseModel {
+export default class PurchaseOrderProduct extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
 
   @column({ serializeAs: "id" })
   public uuid: string;
 
-  @column()
-  public name: string;
+  @column({ serializeAs: "PurchaseOrderId" })
+  public purchaseOrderId: number;
 
-  @column()
-  public quantity: number;
-
-  @column.dateTime({ serializeAs: "expirationDate" })
-  public expirationDate: DateTime;
+  @column.dateTime({ autoCreate: true, serializeAs: "stockOrder" })
+  public stockOrder: DateTime;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
@@ -35,8 +32,8 @@ export default class Product extends BaseModel {
   @beforeFind()
   @beforeFetch()
   public static ignoreDeleted(
-    query: ModelQueryBuilderContract<typeof Product>
+    query: ModelQueryBuilderContract<typeof PurchaseOrderProduct>
   ) {
-    query.andWhereNull("products.deleted_at");
+    query.andWhereNull("purchase_order_products.deleted_at");
   }
 }

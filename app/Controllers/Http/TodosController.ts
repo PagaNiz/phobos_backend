@@ -1,56 +1,72 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import { schema } from "@ioc:Adonis/Core/Validator";
 import Todo from "App/Models/Todo";
+import { DateTime } from "luxon";
+import { randomUUID } from "node:crypto";
 
 export default class TodosController {
-  public async index({ request }: HttpContextContract) {
+  public async index({ response }: HttpContextContract) {
     const todos = await Todo.query();
-    return todos;
+    return response.ok(todos);
   }
 
-  public async show({ request, params }: HttpContextContract) {
+  public async show({ params, response }: HttpContextContract) {
+    const todo = await Todo.findByOrFail("uuid", params.id);
+    return response.ok(todo);
+  }
+
+  public async store({ request, response }: HttpContextContract) {
+    const schemaParsedType = schema.create({
+      title: schema.string(),
+      desc: schema.string(),
+    });
+    const { title, desc } = await request.validate({
+      schema: schemaParsedType,
+    });
+
+    const todo = await Todo.create({
+      uuid: randomUUID(),
+      title,
+      desc,
+    });
+
+    return response.created(todo);
+  }
+
+  public async update({ request, response, params }: HttpContextContract) {
+    const todo = await Todo.findByOrFail("uuid", params.id);
+    const schemaParsedType = schema.create({
+      title: schema.string(),
+      desc: schema.string(),
+      done: schema.boolean(),
+    });
+
+    const { title, desc, done } = await request.validate({
+      schema: schemaParsedType,
+    });
+
     try {
-      const todo = await Todo.find(params.id);
-      if (todo) {
-        return todo;
-      }
+      todo.merge({
+        title,
+        desc,
+        done,
+      });
+
+      await todo.save();
+      return response.ok(todo);
     } catch (error) {
       console.log(error);
+      return response.badRequest(error);
     }
   }
 
-  public async update({ auth, request, params }: HttpContextContract) {
-    const todo = await Todo.find(params.id);
-    if (todo) {
-      todo.title = request.input("title");
-      todo.desc = request.input("desc");
-      todo.done = request.input("done");
-
-      if (await todo.save()) {
-        return todo;
-      }
-      return; // 422
-    }
-    return; // 401
-  }
-
-  public async store({ auth, request, response }: HttpContextContract) {
-    const user = await auth.authenticate();
-    const todo = new Todo();
-    todo.title = request.input("title");
-    todo.desc = request.input("desc");
-    await todo.save();
-    console.log(response.json({ message: "TODO Created successfully!" }));
-    return todo;
-  }
-
-  public async destroy({
-    response,
-    auth,
-    request,
-    params,
-  }: HttpContextContract) {
-    const user = await auth.authenticate();
-    const todo = await Todo.query().where("id", params.id).delete();
-    return response.json({ message: "Deleted successfully" });
+  public async destroy({ response, params }: HttpContextContract) {
+    const todo = await Todo.findByOrFail("uuid", params.id);
+    await todo
+      .merge({
+        deletedAt: DateTime.now(),
+      })
+      .save();
+    return response.noContent();
   }
 }
