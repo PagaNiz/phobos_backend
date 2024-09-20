@@ -9,7 +9,6 @@ export default class AuthController {
       email: schema.string(),
       password: schema.string(),
     });
-
     const { email, password } = await request.validate({
       schema: schemaParsedType,
     });
