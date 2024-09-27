@@ -1,7 +1,6 @@
 import { bind } from "@adonisjs/route-model-binding";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { rules, schema } from "@ioc:Adonis/Core/Validator";
-
 import PurchaseOrder, {
   PurchaseOrderStatus,
   PurchaseOrderTypes,
@@ -20,7 +19,7 @@ export default class PurchaseOrdersController {
     { response }: HttpContextContract,
     purchaseOrder: PurchaseOrder
   ) {
-    console.log("purchaseOrder");
+    return response.ok(purchaseOrder);
   }
 
   public async store({ request, response }: HttpContextContract) {
@@ -57,8 +56,11 @@ export default class PurchaseOrdersController {
     return response.created(purchaseOrder);
   }
 
-  public async update({ request, response, params }: HttpContextContract) {
-    const purchaseOrder = await PurchaseOrder.findByOrFail("uuid", params.id);
+  @bind()
+  public async update(
+    { request, response }: HttpContextContract,
+    purchaseOrder: PurchaseOrder
+  ) {
     const schemaParsedType = schema.create({
       numberDocument: schema.string(),
       totalPrice: schema.number([rules.unsigned()]),
