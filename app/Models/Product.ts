@@ -18,7 +18,13 @@ export default class Product extends BaseModel {
   public name: string;
 
   @column()
+  public category: ProductCategoryTypes;
+
+  @column()
   public quantity: number;
+
+  @column()
+  public price: number;
 
   @column.dateTime({ serializeAs: "expirationDate" })
   public expirationDate: DateTime;
@@ -39,4 +45,10 @@ export default class Product extends BaseModel {
   ) {
     query.andWhereNull("products.deleted_at");
   }
+}
+
+export enum ProductCategoryTypes {
+  doces = "Doces",
+  bebidas = "Bebidas",
+  salgados = "salgados",
 }

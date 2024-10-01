@@ -1,5 +1,5 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import Product from "App/Models/Product";
+import Product, { ProductCategoryTypes } from "App/Models/Product";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { DateTime } from "luxon";
 import { randomUUID } from "node:crypto";
@@ -18,18 +18,23 @@ export default class ProductsController {
   public async store({ request, response }: HttpContextContract) {
     const schemaParsedType = schema.create({
       name: schema.string(),
+      category: schema.enum(Object.values(ProductCategoryTypes)),
       quantity: schema.number(),
+      price: schema.number(),
       expirationDate: schema.date(),
     });
 
-    const { name, quantity, expirationDate } = await request.validate({
-      schema: schemaParsedType,
-    });
+    const { name, category, quantity, price, expirationDate } =
+      await request.validate({
+        schema: schemaParsedType,
+      });
 
     const product = await Product.create({
       uuid: randomUUID(),
       name,
+      category,
       quantity,
+      price,
       expirationDate,
     });
 
@@ -40,18 +45,23 @@ export default class ProductsController {
     const product = await Product.findByOrFail("uuid", params.id);
     const schemaParsedType = schema.create({
       name: schema.string(),
+      category: schema.enum(Object.values(ProductCategoryTypes)),
       quantity: schema.number(),
+      price: schema.number(),
       expirationDate: schema.date(),
     });
 
-    const { name, quantity, expirationDate } = await request.validate({
-      schema: schemaParsedType,
-    });
+    const { name, category, quantity, price, expirationDate } =
+      await request.validate({
+        schema: schemaParsedType,
+      });
 
     try {
       product.merge({
         name,
+        category,
         quantity,
+        price,
         expirationDate,
       });
 
