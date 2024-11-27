@@ -21,10 +21,11 @@ export default class ProductsController {
       category: schema.enum(Object.values(ProductCategoryTypes)),
       quantity: schema.number(),
       price: schema.number(),
+      supplierPrice: schema.number(),
       expirationDate: schema.date(),
     });
 
-    const { name, category, quantity, price, expirationDate } =
+    const { name, category, quantity, price, supplierPrice, expirationDate } =
       await request.validate({
         schema: schemaParsedType,
       });
@@ -35,6 +36,7 @@ export default class ProductsController {
       category,
       quantity,
       price,
+      supplierPrice,
       expirationDate,
     });
 
@@ -48,10 +50,11 @@ export default class ProductsController {
       category: schema.enum(Object.values(ProductCategoryTypes)),
       quantity: schema.number(),
       price: schema.number(),
+      supplierPrice: schema.number(),
       expirationDate: schema.date(),
     });
 
-    const { name, category, quantity, price, expirationDate } =
+    const { name, category, quantity, price, supplierPrice, expirationDate } =
       await request.validate({
         schema: schemaParsedType,
       });
@@ -62,6 +65,7 @@ export default class ProductsController {
         category,
         quantity,
         price,
+        supplierPrice,
         expirationDate,
       });
 

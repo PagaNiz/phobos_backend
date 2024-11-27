@@ -26,6 +26,9 @@ export default class Product extends BaseModel {
   @column()
   public price: number;
 
+  @column()
+  public supplierPrice: number;
+
   @column.dateTime({ serializeAs: "expirationDate" })
   public expirationDate: DateTime;
 

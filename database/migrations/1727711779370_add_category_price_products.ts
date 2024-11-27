@@ -12,6 +12,7 @@ export default class extends BaseSchema {
         .defaultTo(ProductCategoryTypes.bebidas)
         .after("name");
       table.decimal("price").after("quantity");
+      table.decimal("supplier_price").after("price");
     });
   }
 
@@ -19,6 +20,7 @@ export default class extends BaseSchema {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropColumn("category");
       table.dropColumn("price");
+      table.decimal("supplier_price").after("price");
     });
   }
 }
