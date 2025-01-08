@@ -1,12 +1,12 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import { schema } from "@ioc:Adonis/Core/Validator";
+import { schema, rules } from "@ioc:Adonis/Core/Validator";
 import User from "App/Models/User";
 import { DateTime } from "luxon";
 import { randomUUID } from "node:crypto";
 export default class AuthController {
   public async login({ request, auth }: HttpContextContract) {
     const schemaParsedType = schema.create({
-      email: schema.string(),
+      email: schema.string([rules.email()]),
       password: schema.string(),
     });
     const { email, password } = await request.validate({
@@ -42,6 +42,13 @@ export default class AuthController {
     });
 
     return token.toJSON();
+  }
+
+  public async show({ auth, response }: HttpContextContract) {
+    const user = await auth.use("api").authenticate();
+    if (!user) return response.unauthorized();
+
+    return response.ok(user);
   }
 
   public async destroy({ response, params }: HttpContextContract) {

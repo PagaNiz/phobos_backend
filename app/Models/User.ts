@@ -28,13 +28,17 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public password: string;
 
-  @column()
+  @column({ serializeAs: "rememberMeToken" })
   public rememberMeToken: string | null;
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ serializeAs: "createdAt", autoCreate: true })
   public createdAt: DateTime;
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    serializeAs: "updatedAt",
+    autoCreate: true,
+    autoUpdate: true,
+  })
   public updatedAt: DateTime;
 
   @column.dateTime({ serializeAs: null })
