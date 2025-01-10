@@ -2,11 +2,11 @@ import Route from "@ioc:Adonis/Core/Route";
 
 Route.group(() => {
   Route.group(() => {
-    Route.post("/register", "ClientsController.store");
+    Route.post("/", "ClientsController.store");
     Route.get("/", "ClientsController.index");
-    Route.get("/:id", "ClientsController.show");
-    Route.put("/update/:id", "ClientsController.update");
-    Route.delete("/delete/:id", "ClientsController.destroy");
+    Route.get("/:client(uuid)", "ClientsController.show");
+    Route.put("/:client(uuid)", "ClientsController.update");
+    Route.delete("/:client(uuid)", "ClientsController.destroy");
   })
     .prefix("client")
     .middleware("auth:api");

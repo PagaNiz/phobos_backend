@@ -3,9 +3,12 @@ import {
   BaseModel,
   beforeFetch,
   beforeFind,
+  BelongsTo,
+  belongsTo,
   column,
   ModelQueryBuilderContract,
 } from "@ioc:Adonis/Lucid/Orm";
+import Supplier from "./Supplier";
 
 export default class Product extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
@@ -28,6 +31,12 @@ export default class Product extends BaseModel {
 
   @column()
   public supplierPrice: number;
+
+  @column({ serializeAs: null })
+  public supplierId: number;
+
+  @belongsTo(() => Supplier)
+  public supplier: BelongsTo<typeof Supplier>;
 
   @column.dateTime({ serializeAs: "expirationDate" })
   public expirationDate: DateTime;

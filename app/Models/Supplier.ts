@@ -3,22 +3,34 @@ import {
   BaseModel,
   beforeFetch,
   beforeFind,
+  BelongsTo,
+  belongsTo,
   column,
+  HasMany,
+  hasMany,
   ModelQueryBuilderContract,
 } from "@ioc:Adonis/Lucid/Orm";
+import Address from "./Address";
+import Product from "./Product";
 
-export default class PurchaseOrderProduct extends BaseModel {
+export default class Supplier extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
 
   @column({ serializeAs: "id" })
   public uuid: string;
 
-  @column({ serializeAs: null })
-  public purchaseOrderId: number;
+  @column()
+  public name: string;
 
-  @column.dateTime({ autoCreate: true, serializeAs: "stockOrder" })
-  public stockOrder: DateTime;
+  @column({ serializeAs: null })
+  public addressId: number;
+
+  @belongsTo(() => Address)
+  public address: BelongsTo<typeof Address>;
+
+  @hasMany(() => Product)
+  public products: HasMany<typeof Product>;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
@@ -32,8 +44,8 @@ export default class PurchaseOrderProduct extends BaseModel {
   @beforeFind()
   @beforeFetch()
   public static ignoreDeleted(
-    query: ModelQueryBuilderContract<typeof PurchaseOrderProduct>
+    query: ModelQueryBuilderContract<typeof Supplier>
   ) {
-    query.andWhereNull("purchase_order_products.deleted_at");
+    query.andWhereNull("suppliers.deleted_at");
   }
 }

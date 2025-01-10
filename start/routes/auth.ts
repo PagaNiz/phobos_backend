@@ -4,5 +4,5 @@ Route.group(() => {
   Route.post("register", "AuthController.register");
   Route.post("login", "AuthController.login");
   Route.get("login", "AuthController.show");
-  Route.delete("user/delete", "AuthController.destroy");
+  Route.delete("user/:user(uuid)", "AuthController.destroy");
 }).prefix("api");

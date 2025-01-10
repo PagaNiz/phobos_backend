@@ -7,18 +7,36 @@ import {
   ModelQueryBuilderContract,
 } from "@ioc:Adonis/Lucid/Orm";
 
-export default class PurchaseOrderProduct extends BaseModel {
+export default class Address extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
 
   @column({ serializeAs: "id" })
   public uuid: string;
 
-  @column({ serializeAs: null })
-  public purchaseOrderId: number;
+  @column()
+  public street: string;
 
-  @column.dateTime({ autoCreate: true, serializeAs: "stockOrder" })
-  public stockOrder: DateTime;
+  @column()
+  public number: number;
+
+  @column()
+  public neighborhood: string;
+
+  @column()
+  public complement: string;
+
+  @column()
+  public city: string;
+
+  @column()
+  public state: string;
+
+  @column()
+  public country: string;
+
+  @column({ serializeAs: "zipCode" })
+  public zipCode: string;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
@@ -32,8 +50,8 @@ export default class PurchaseOrderProduct extends BaseModel {
   @beforeFind()
   @beforeFetch()
   public static ignoreDeleted(
-    query: ModelQueryBuilderContract<typeof PurchaseOrderProduct>
+    query: ModelQueryBuilderContract<typeof Address>
   ) {
-    query.andWhereNull("purchase_order_products.deleted_at");
+    query.andWhereNull("addresses.deleted_at");
   }
 }
