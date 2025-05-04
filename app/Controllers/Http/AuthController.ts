@@ -46,7 +46,7 @@ export default class AuthController {
   }
 
   public async show({ auth, response }: HttpContextContract) {
-    const user = await auth.use("api").authenticate();
+    const user = auth.user;
     if (!user) return response.unauthorized();
 
     return response.ok(user);

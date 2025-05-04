@@ -24,7 +24,7 @@ export default class Address extends BaseModel {
   public neighborhood: string;
 
   @column()
-  public complement: string;
+  public complement: string | null;
 
   @column()
   public city: string;

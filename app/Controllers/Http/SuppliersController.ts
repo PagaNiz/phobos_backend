@@ -8,7 +8,7 @@ import { bind } from "@adonisjs/route-model-binding";
 
 export default class SuppliersController {
   public async index({ response }: HttpContextContract) {
-    const suppliers = await Supplier.query();
+    const suppliers = await Supplier.query().preload("address").paginate(1, 10);
     return response.ok(suppliers);
   }
 
@@ -20,12 +20,16 @@ export default class SuppliersController {
   public async store({ request, response }: HttpContextContract) {
     const schemaParsedType = schema.create({
       name: schema.string(),
-      addressId: schema.string([rules.uuid()]),
+      addressId: schema.string.nullableAndOptional([
+        rules.uuid(),
+        rules.exists({ table: "address", column: "uuid" }),
+      ]),
       street: schema.string(),
       number: schema.number(),
       neighborhood: schema.string(),
-      complement: schema.string(),
+      complement: schema.string.nullableAndOptional(),
       city: schema.string(),
+      state: schema.string(),
       country: schema.string(),
       zipCode: schema.string(),
     });
@@ -38,25 +42,34 @@ export default class SuppliersController {
       neighborhood,
       complement,
       city,
+      state,
       country,
       zipCode,
     } = await request.validate({
       schema: schemaParsedType,
     });
 
-    const address = await Address.findByOrFail("uuid", addressId);
+    let address: Address;
+    if (addressId) {
+      address = await Address.findByOrFail("uuid", addressId);
+    } else {
+      address = await Address.create({
+        uuid: randomUUID(),
+        street,
+        number,
+        neighborhood,
+        complement,
+        city,
+        state,
+        country,
+        zipCode,
+      });
+    }
 
     const supplier = await Supplier.create({
       uuid: randomUUID(),
       name,
       addressId: address.id,
-      street,
-      number,
-      neighborhood,
-      complement,
-      city,
-      country,
-      zipCode,
     });
 
     return response.created(supplier);
@@ -68,10 +81,15 @@ export default class SuppliersController {
     supplier: Supplier
   ) {
     const schemaParsedType = schema.create({
+      addressId: schema.string.optional([
+        rules.uuid(),
+        rules.exists({ table: "addresses", column: "uuid" }),
+      ]),
+      name: schema.string(),
       street: schema.string(),
       number: schema.number(),
       neighborhood: schema.string(),
-      complement: schema.string(),
+      complement: schema.string.nullableAndOptional(),
       city: schema.string(),
       state: schema.string(),
       country: schema.string(),
@@ -79,6 +97,7 @@ export default class SuppliersController {
     });
 
     const {
+      name,
       street,
       number,
       neighborhood,
@@ -92,17 +111,32 @@ export default class SuppliersController {
     });
 
     try {
-      supplier.merge({
-        street,
-        number,
-        neighborhood,
-        complement,
-        city,
-        state,
-        country,
-        zipCode,
-      });
-
+      if (name) {
+        supplier.merge({ name });
+      }
+      if (
+        street ||
+        number ||
+        neighborhood ||
+        complement ||
+        city ||
+        state ||
+        country ||
+        zipCode
+      ) {
+        const address = await supplier.related("address").query().firstOrFail();
+        address.merge({
+          street,
+          number,
+          neighborhood,
+          complement,
+          city,
+          state,
+          country,
+          zipCode,
+        });
+        await address.save();
+      }
       await supplier.save();
       return response.ok(supplier);
     } catch (error) {
