@@ -1,3 +1,4 @@
+import { bind } from "@adonisjs/route-model-binding";
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema, rules } from "@ioc:Adonis/Core/Validator";
 import User from "App/Models/User";
@@ -45,14 +46,14 @@ export default class AuthController {
   }
 
   public async show({ auth, response }: HttpContextContract) {
-    const user = await auth.use("api").authenticate();
+    const user = auth.user;
     if (!user) return response.unauthorized();
 
     return response.ok(user);
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
-    const user = await User.findByOrFail("uuid", params.id);
+  @bind()
+  public async destroy({ response }: HttpContextContract, user: User) {
     await user
       .merge({
         deletedAt: DateTime.now(),

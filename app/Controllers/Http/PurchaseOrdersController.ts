@@ -99,9 +99,12 @@ export default class PurchaseOrdersController {
     }
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
-    const purchaseOrders = await PurchaseOrder.findByOrFail("uuid", params.id);
-    await purchaseOrders
+  @bind()
+  public async destroy(
+    { response }: HttpContextContract,
+    purchaseOrder: PurchaseOrder
+  ) {
+    await purchaseOrder
       .merge({
         deletedAt: DateTime.now(),
       })

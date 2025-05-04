@@ -34,8 +34,8 @@ export default class UsersController {
     return response.created(user);
   }
 
-  public async update({ request, response, params }: HttpContextContract) {
-    const user = await User.findByOrFail("uuid", params.id);
+  @bind()
+  public async update({ request, response }: HttpContextContract, user: User) {
     const schemaParsedType = schema.create({
       name: schema.string(),
       email: schema.string(),
@@ -57,8 +57,8 @@ export default class UsersController {
     }
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
-    const user = await User.findByOrFail("uuid", params.id);
+  @bind()
+  public async destroy({ response }: HttpContextContract, user: User) {
     await user.merge({ deletedAt: DateTime.now() }).save();
     return response.noContent();
   }

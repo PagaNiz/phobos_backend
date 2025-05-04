@@ -3,6 +3,7 @@ import Client from "App/Models/Client";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { DateTime } from "luxon";
 import { randomUUID } from "node:crypto";
+import { bind } from "@adonisjs/route-model-binding";
 
 export default class ClientsController {
   public async index({ response }: HttpContextContract) {
@@ -10,8 +11,8 @@ export default class ClientsController {
     return response.ok(clients);
   }
 
-  public async show({ params, response }: HttpContextContract) {
-    const client = await Client.findByOrFail("uuid", params.id);
+  @bind()
+  public async show({ response }: HttpContextContract, client: Client) {
     return response.ok(client);
   }
 
@@ -41,8 +42,11 @@ export default class ClientsController {
     return response.created(client);
   }
 
-  public async update({ request, response, params }: HttpContextContract) {
-    const client = await Client.findByOrFail("uuid", params.id);
+  @bind()
+  public async update(
+    { request, response }: HttpContextContract,
+    client: Client
+  ) {
     const schemaParsedType = schema.create({
       name: schema.string(),
       phone: schema.string(),
@@ -73,8 +77,8 @@ export default class ClientsController {
     }
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
-    const client = await Client.findByOrFail("uuid", params.id);
+  @bind()
+  public async destroy({ response }: HttpContextContract, client: Client) {
     await client
       .merge({
         deletedAt: DateTime.now(),
